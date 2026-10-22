@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'repozitorij.dart';
 import 'zadatak.dart';
 
@@ -28,13 +29,15 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
   // Promijenite parametre da isprobate sva stanja:
   // neuspjeha: 1 -> prvi dohvat padne, ponovni pokušaj uspije
   // prazno: true -> poslužitelj vraća prazan popis
-  final _repo = ZadatakRepozitorij(neuspjeha: 0, prazno: false);
+  // prvi dohvat pada, ponovni pokušaj uspijeva
+  final _repo = ZadatakRepozitorij(neuspjeha: 1, prazno: true);
   late Future<List<Zadatak>> _buduci = _repo.dohvati();
 
-  void _ponovi() {
+  Future<void> _osvjezi() async {
     setState(() {
       _buduci = _repo.dohvati();
     });
+    await _buduci;
   }
 
   @override
@@ -54,10 +57,12 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
                 children: [
                   const Icon(Icons.error_outline, size: 48, color: Colors.red),
                   const SizedBox(height: 8),
-                  Text('${snap.error}'),
+                  const Text(
+                    'Došlo je do pogreške pri dohvaćanju podataka. Molimo pokušajte ponovno.',
+                  ),
                   const SizedBox(height: 8),
                   FilledButton(
-                    onPressed: _ponovi,
+                    onPressed: _osvjezi,
                     child: const Text('Pokušaj ponovno'),
                   ),
                 ],
@@ -68,22 +73,51 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
           if (zadaci.isEmpty) {
             return const Center(child: Text('Nema zadataka'));
           }
-          return ListView.builder(
-            itemCount: zadaci.length,
-            itemBuilder: (context, i) {
-              final z = zadaci[i];
-              return ListTile(
-                leading: Icon(
-                  z.zavrsen ? Icons.check_circle : Icons.radio_button_unchecked,
-                ),
-                title: Text(
-                  z.naslov,
-                  style: TextStyle(
-                    decoration: z.zavrsen ? TextDecoration.lineThrough : null,
+          final zavrseniBroj = zadaci.where((z) => z.zavrsen).length;
+
+          // 3. ZADATAK: Omotano u RefreshIndicator + 2. ZADATAK: Tekst o završenim zadacima ispod
+          return Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _osvjezi,
+                  child: ListView.builder(
+                    itemCount: zadaci.length,
+                    itemBuilder: (context, i) {
+                      final z = zadaci[i];
+                      return ListTile(
+                        leading: Icon(
+                          z.zavrsen
+                              ? Icons.check_circle
+                              : Icons.radio_button_unchecked,
+                        ),
+                        title: Text(
+                          z.naslov,
+                          style: TextStyle(
+                            decoration: z.zavrsen
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-              );
-            },
+              ),
+              // Prikaz broja završenih zadataka na dnu zaslona
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                alignment: Alignment.center,
+                color: Colors.grey.shade100,
+                child: Text(
+                  'Završeno: $zavrseniBroj od ${zadaci.length}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'zadatak.dart';
 
 class ZadatciException implements Exception {
@@ -27,14 +28,14 @@ class ZadatakRepozitorij {
 
   Future<List<Zadatak>> dohvati() async {
     await Future.delayed(const Duration(milliseconds: 800));
-    
+
     if (neuspjeha > 0) {
       neuspjeha--;
       throw ZadatciException('Nema veze s poslužiteljem');
     }
-    
+
     if (prazno) return const [];
-    
+
     final podaci = jsonDecode(_odgovor) as List;
     return podaci
         .map((e) => Zadatak.fromJson(e as Map<String, dynamic>))
