@@ -10,10 +10,14 @@ class ZadatciApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Zadatci',
-      home: ZadatciEkran(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        useMaterial3: true,
+      ),
+      home: const ZadatciEkran(),
     );
   }
 }
@@ -30,7 +34,7 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
   // neuspjeha: 1 -> prvi dohvat padne, ponovni pokušaj uspije
   // prazno: true -> poslužitelj vraća prazan popis
   // prvi dohvat pada, ponovni pokušaj uspijeva
-  final _repo = ZadatakRepozitorij(neuspjeha: 1, prazno: true);
+  final _repo = ZadatakRepozitorij(neuspjeha: 0, prazno: false);
   late Future<List<Zadatak>> _buduci = _repo.dohvati();
 
   Future<void> _osvjezi() async {
@@ -44,6 +48,11 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Zadatci')),
+      floatingActionButton: FloatingActionButton(
+      onPressed: () {},
+      tooltip: 'Novi zadatak',
+      child: const Icon(Icons.add),
+      ),
       body: FutureBuilder<List<Zadatak>>(
         future: _buduci,
         builder: (context, snap) {

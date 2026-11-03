@@ -6,6 +6,7 @@
 * **Verzija Darta:** 3.13.5
 * **Korišteni uređaj:** Windows (desktop) / Chrome
 
+**VJEŽBA 2**
 # 1. pitanje
 **Zašto polja modela nisu promjenjiva (final)?**
   Da bi objekt bio imutable (nepromjenjiv), što sprječava nepredvidive promjene podataka u hodu. Umjesto mijenjanja postojećeg objekta, koristimo metodu kopiraj koja vraća novu instancu s izmijenjenim vrijednostima.
@@ -28,3 +29,7 @@ Ako se iznimka (error) unutar Future-a ne obradi pomoću try-catch bloka ili .ca
   3. **Stanje uspješnih podataka (Success / Data):** Prikazuje se kada su podaci uspješno dohvaćeni (npr. ListView s popisom elemenata ili poruka da je popis prazan).
 
 
+**VJEŽBA 3**
+# 1. pitanje
+**Zašto je bolje zadati boju u temi nego na svakom widgetu?**
+Zbog lakšeg održavanja jer ako poželimo promijeniti temu cijele aplikacije, to možemo napraviti na jednom mjestu.
