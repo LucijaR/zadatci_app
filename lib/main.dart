@@ -55,15 +55,14 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
     );
     if (!mounted || novi == null) return;
     setState(() => _zadaci.add(novi));
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Dodano: ${novi.naslov}')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Dodano: ${novi.naslov}')));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Zadatci')),
+      appBar: AppBar(title: Text('Zadatci (${_zadaci.length})')),
       floatingActionButton: FloatingActionButton(
         onPressed: _dodaj,
         tooltip: 'Novi zadatak',
@@ -101,15 +100,12 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
               final z = _zadaci[i];
               return ListTile(
                 leading: Icon(
-                  z.zavrsen
-                      ? Icons.check_circle
-                      : Icons.radio_button_unchecked,
+                  z.zavrsen ? Icons.check_circle : Icons.radio_button_unchecked,
                 ),
                 title: Text(
                   z.naslov,
                   style: TextStyle(
-                    decoration:
-                        z.zavrsen ? TextDecoration.lineThrough : null,
+                    decoration: z.zavrsen ? TextDecoration.lineThrough : null,
                   ),
                 ),
               );

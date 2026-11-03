@@ -33,3 +33,15 @@ Ako se iznimka (error) unutar Future-a ne obradi pomoću try-catch bloka ili .ca
 # 1. pitanje
 **Zašto je bolje zadati boju u temi nego na svakom widgetu?**
 Zbog lakšeg održavanja jer ako poželimo promijeniti temu cijele aplikacije, to možemo napraviti na jednom mjestu.
+
+### Provjera razumijevanja
+
+1. **Što radi validate() i zašto validator vraća null za ispravan unos?**
+   - Metoda validate() prolazi kroz sva polja unutar forme i pokreće funkcije za provjeru, tj. validatore
+   - Validator vraća null kada je unos ispravan jer u Flutteru null označava da nema pogreške.
+
+2. **Zašto se nakon await Navigator.push provjerava mounted?**
+   - Provjerava se je li widget još uvijek prisutan i aktivan na zaslonu. Pošto je Navigator.push asinkron, moguće je da je u međuvremenu došlo do promjene ekrana pa provjera sprječava greške.
+
+3. **Izmjene za M1**
+  Dodano je upravljanje greškama i stanjem kroz gumb za ponovni pokušaj i dinamički naslov, dodani su unos i validacija novih zadataka te povratak na glavni ekran pomoću Navigatora.

@@ -27,6 +27,14 @@ class _FormaEkranState extends State<FormaEkran> {
     final tekst = vrijednost?.trim() ?? '';
     if (tekst.isEmpty) return 'Unesite naslov';
     if (tekst.length < 3) return 'Naslov mora imati najmanje 3 znaka';
+    if (tekst.length > 40) return 'Naslov može imati najviše 40 znakova';
+    if (tekst[0] != tekst[0].toUpperCase()) {
+      return 'Naslov mora početi velikim slovom';
+    }
+    final postoji = widget.postojeci.any(
+      (z) => z.naslov.trim().toLowerCase() == tekst.toLowerCase(),
+    );
+    if (postoji) return 'Zadatak s ovim naslovom već postoji';
     return null;
   }
 
@@ -79,6 +87,11 @@ class _FormaEkranState extends State<FormaEkran> {
               ),
               const SizedBox(height: 8),
               FilledButton(onPressed: _spremi, child: const Text('Spremi')),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Odustani'),
+              ),
             ],
           ),
         ),
