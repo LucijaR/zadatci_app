@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'forma_ekran.dart';
 import 'repozitorij.dart';
-import 'zadatak.dart';
+import 'statistika_ekran.dart';
+import 'zadatci_viewmodel.dart';
 
 void main() => runApp(const ZadatciApp());
 
@@ -31,86 +31,100 @@ class ZadatciEkran extends StatefulWidget {
 }
 
 class _ZadatciEkranState extends State<ZadatciEkran> {
-  final _repo = ZadatakRepozitorij();
-  final List<Zadatak> _zadaci = [];
-  late Future<void> _ucitavanje = _ucitaj();
+  final _vm = ZadatciViewModel(ZadatakRepozitorij());
 
-  Future<void> _ucitaj() async {
-    final podaci = await _repo.dohvati();
-    _zadaci
-      ..clear()
-      ..addAll(podaci);
+  @override
+  void initState() {
+    super.initState();
+    _vm.ucitaj();
   }
 
-  void _ponovi() {
-    setState(() {
-      _ucitavanje = _ucitaj();
-    });
+  @override
+  void dispose() {
+    _vm.dispose();
+    super.dispose();
   }
 
   Future<void> _dodaj() async {
-    final novi = await Navigator.push<Zadatak>(
+    final naslov = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (_) => FormaEkran(postojeci: _zadaci)),
+      MaterialPageRoute(builder: (_) => const FormaEkran()),
     );
-    if (!mounted || novi == null) return;
-    setState(() => _zadaci.add(novi));
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Dodano: ${novi.naslov}')));
+    if (!mounted || naslov == null) return;
+    _vm.dodaj(naslov);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Dodano: $naslov')),
+    );
+  }
+
+  void _otvoriStatistiku() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => StatistikaEkran(vm: _vm)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Zadatci (${_zadaci.length})')),
+      appBar: AppBar(
+        title: const Text('Zadatci'),
+        actions: [
+          IconButton(
+            onPressed: _otvoriStatistiku,
+            tooltip: 'Statistika',
+            icon: const Icon(Icons.bar_chart),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _dodaj,
         tooltip: 'Novi zadatak',
         child: const Icon(Icons.add),
       ),
-      body: FutureBuilder<void>(
-        future: _ucitavanje,
-        builder: (context, snap) {
-          if (snap.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snap.hasError) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                  const SizedBox(height: 8),
-                  Text('${snap.error}'),
-                  const SizedBox(height: 8),
-                  FilledButton(
-                    onPressed: _ponovi,
-                    child: const Text('Pokušaj ponovno'),
-                  ),
-                ],
-              ),
-            );
-          }
-          if (_zadaci.isEmpty) {
-            return const Center(child: Text('Nema zadataka'));
-          }
-          return ListView.builder(
-            itemCount: _zadaci.length,
-            itemBuilder: (context, i) {
-              final z = _zadaci[i];
-              return ListTile(
-                leading: Icon(
-                  z.zavrsen ? Icons.check_circle : Icons.radio_button_unchecked,
-                ),
-                title: Text(
-                  z.naslov,
-                  style: TextStyle(
-                    decoration: z.zavrsen ? TextDecoration.lineThrough : null,
-                  ),
+      body: ListenableBuilder(
+        listenable: _vm,
+        builder: (context, _) {
+          switch (_vm.stanje) {
+            case Stanje.ucitavanje:
+              return const Center(child: CircularProgressIndicator());
+            case Stanje.greska:
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const SizedBox(height: 8),
+                    Text(_vm.poruka),
+                    const SizedBox(height: 8),
+                    FilledButton(
+                      onPressed: _vm.ucitaj,
+                      child: const Text('Pokušaj ponovno'),
+                    ),
+                  ],
                 ),
               );
-            },
-          );
+            case Stanje.uspjeh:
+              if (_vm.zadatci.isEmpty) {
+                return const Center(child: Text('Nema zadataka'));
+              }
+              return ListView.builder(
+                itemCount: _vm.zadatci.length,
+                itemBuilder: (context, i) {
+                  final z = _vm.zadatci[i];
+                  return CheckboxListTile(
+                    value: z.zavrsen,
+                    onChanged: (_) => _vm.promijeniZavrsen(z.id),
+                    title: Text(
+                      z.naslov,
+                      style: TextStyle(
+                        decoration: z.zavrsen ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                  );
+                },
+              );
+          }
         },
       ),
     );
