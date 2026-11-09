@@ -36,4 +36,11 @@ void main() {
     vm.promijeniZavrsen(3);
     expect(vm.zavrseno, 3);
   });
+
+  test('ukloni briše zadatak i smanjuje ukupno', () async {
+  final vm = ZadatciViewModel(ZadatakRepozitorij());
+  await vm.ucitaj();
+  vm.ukloni(3);
+  expect(vm.ukupno, 3);
+});
 }

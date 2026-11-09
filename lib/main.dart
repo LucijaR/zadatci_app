@@ -71,6 +71,11 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
         title: const Text('Zadatci'),
         actions: [
           IconButton(
+          onPressed: _vm.toggleSamoNezavrseni,
+          icon: Icon(_vm.samoNezavrseni ? Icons.filter_alt : Icons.filter_alt_off),
+          tooltip: 'Filter',
+          ),
+          IconButton(
             onPressed: _otvoriStatistiku,
             tooltip: 'Statistika',
             icon: const Icon(Icons.bar_chart),
@@ -105,14 +110,18 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
                 ),
               );
             case Stanje.uspjeh:
-              if (_vm.zadatci.isEmpty) {
+              if (_vm.prikazani.isEmpty) {
                 return const Center(child: Text('Nema zadataka'));
               }
               return ListView.builder(
-                itemCount: _vm.zadatci.length,
+                itemCount: _vm.prikazani.length,
                 itemBuilder: (context, i) {
-                  final z = _vm.zadatci[i];
-                  return CheckboxListTile(
+                final z = _vm.zadatci[i];
+                return Dismissible(
+                  key: ValueKey(z.id),
+                  onDismissed: (_) => _vm.ukloni(z.id),
+                  background: Container(color: const Color.fromARGB(255, 224, 24, 10)),
+                  child: CheckboxListTile(
                     value: z.zavrsen,
                     onChanged: (_) => _vm.promijeniZavrsen(z.id),
                     title: Text(
@@ -121,8 +130,9 @@ class _ZadatciEkranState extends State<ZadatciEkran> {
                         decoration: z.zavrsen ? TextDecoration.lineThrough : null,
                       ),
                     ),
-                  );
-                },
+                  ),
+                );
+              },
               );
           }
         },

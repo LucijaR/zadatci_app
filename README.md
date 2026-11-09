@@ -45,3 +45,16 @@ Zbog lakšeg održavanja jer ako poželimo promijeniti temu cijele aplikacije, t
 
 3. **Izmjene za M1**
   Dodano je upravljanje greškama i stanjem kroz gumb za ponovni pokušaj i dinamički naslov, dodani su unos i validacija novih zadataka te povratak na glavni ekran pomoću Navigatora.
+
+  **VJEŽBA 4**
+### Provjera razumijevanja 1: navedite tri stvari koje u vježbi 3 rade ekranu ne pripadaju (po obrascu MVVM) i u koji bi sloj ih premjestili
+  To su poslovna logika i validacija podataka, upravljanje stanjem liste i mrežni pozivi,
+
+### Provjera razumijevanja 2: što bi se dogodilo kad bi StatistikaEkran u svom initState stvorio novi ZadatciViewModel(ZadatakRepozitorij())?
+  Statistika ne bi prikazivala podatke s glavnog ekrana, nego bi imala svoju vlastitu instancu. Kada se naprave promjene na glavnom ekranu, te promjene ne bi bile vidljive na statistici jer dva ekrana ne bi dijelila isti objekt stanja.
+
+### Provjera razumijevanja 3: zašto ViewModel izlaže UnmodifiableListView, a ne običnu listu? Navedite što bi moglo poći po zlu.
+  Zato da vanjski kod ne može izravno mijenjati listu,a da ViewModel to ne vidi. Ako bi to bilo dozvoljeno, UI bi mogao mijenjati podatke bez provjera i bez pozivanja notifyListeners().
+
+### Provjera razumijevanja 4: što se dogodi s osvježavanjem ekrana ako u metodi promijeniZavrsen izostavite notifyListeners()? Isprobajte i opišite što ste vidjeli.
+  Podatak bi se u memoriji promijenio, ali ekran se ne bi osvježio. Korisnik bi kliknuo kvačicu na checkboxu, ali kvačica se ne bi pojavila niti bi se tekst prekrižio sve dok se ekran ponovno ne nacrta.

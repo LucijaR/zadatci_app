@@ -12,14 +12,28 @@ class ZadatciViewModel extends ChangeNotifier {
   final List<Zadatak> _zadatci = [];
   Stanje _stanje = Stanje.ucitavanje;
   String _poruka = '';
+  bool _samoNezavrseni = false;
 
   UnmodifiableListView<Zadatak> get zadatci => UnmodifiableListView(_zadatci);
   Stanje get stanje => _stanje;
   String get poruka => _poruka;
+  bool get samoNezavrseni => _samoNezavrseni;
 
   int get ukupno => _zadatci.length;
   int get zavrseno => _zadatci.where((z) => z.zavrsen).length;
   int get preostalo => ukupno - zavrseno;
+
+  List<Zadatak> get prikazani {
+  if (_samoNezavrseni) {
+    return _zadatci.where((z) => !z.zavrsen).toList();
+  }
+  return _zadatci;
+}
+
+void toggleSamoNezavrseni() {
+  _samoNezavrseni = !_samoNezavrseni;
+  notifyListeners();
+}
 
   Future<void> ucitaj() async {
     _stanje = Stanje.ucitavanje;
@@ -53,4 +67,9 @@ class ZadatciViewModel extends ChangeNotifier {
     _zadatci[i] = _zadatci[i].kopiraj(zavrsen: !_zadatci[i].zavrsen);
     notifyListeners();
   }
+
+  void ukloni(int id) {
+  _zadatci.removeWhere((z) => z.id == id);
+  notifyListeners();
+}
 }
